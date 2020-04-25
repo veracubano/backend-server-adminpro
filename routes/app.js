@@ -9,5 +9,4 @@ app.get('/', (req, res, next) => { // esta es la ruta principal
     });
 });
 
-
 module.exports = app;

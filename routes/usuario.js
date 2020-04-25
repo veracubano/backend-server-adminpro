@@ -13,7 +13,11 @@ var Usuario = require('../models/usuario'); // se importa el "usuarioSchema", al
 //------ Obtener todos los usuarios --------------------
 //======================================================
 app.get('/', (req, res, next) => {
+    var desde = req.query.desde || 0; // el valor de la variable "desde" se recibe como otro parametro del método GET
+    desde = Number(desde); // se obliga a que sea de tipo "number"
     Usuario.find({}, 'nombre email img role')
+        .skip(desde) // se salta el valor que tenga la variable "desde", es decir, si desde = 5 me entrega los registros a partir del 6
+        .limit(5) // limita la respuesta a solamente 5 registros en este caso
         .exec((err, usuarios) => {
             if (err) {
                 return res.status(500).json({
@@ -22,9 +26,12 @@ app.get('/', (req, res, next) => {
                     errors: err
                 });
             }
-            res.status(200).json({
-                ok: true,
-                usuarios: usuarios
+            Usuario.count({}, (err, conteo) => {
+                res.status(200).json({
+                    ok: true,
+                    usuarios: usuarios,
+                    total: conteo
+                });
             });
         });
 });
